@@ -2,15 +2,21 @@
 
 import sys
 
+# LDI: load "immediate", store a value in a register, or "set this register to this value".
+LDI = 0b10000010
+# PRN: a pseudo-instruction that prints the numeric value stored in a register.
+PRN = 0b01000111
+HLT = 0b00000001  # HLT: halt the CPU and exit the emulator.
+
 
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        self.reg = [0] * 8
+        self.reg = [0] * 8  # Register R0-R7
         self.ram = [0] * 256
-        self.pc = 0
+        self.pc = 0  # Program Counter, which is the address/index of the current instruction
         self.running = True
 
     # Accepts the address to read and return the value stored there.
@@ -20,9 +26,6 @@ class CPU:
     # Accept a value to write, and the address to write it to.
     def ram_write(self, address, value):
         self.ram[address] = value
-
-    def HLT(self):
-        self.running = False
 
     def load(self):
         """Load a program into memory."""
@@ -79,18 +82,21 @@ class CPU:
         running = True
         while running:
             # It needs to read the memory address that's stored in register `PC
+            # Which is the current index in memory
             ir = self.ram_read(self.pc)
             # Sometimes the byte value is a register number,other times it's a constant value
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
             # perform the actions needed for the instruction per the LS-8 spec
             if ir == LDI:
-                pass
+                # sets a specified register to a specified value.
+                self.reg[operand_a] = operand_b
+                self.pc += 3
             elif ir == PRN:
-                pass
-            elif ir == MUL:
-                pass
+                print(self.reg[operand_a])
+                self.pc += 2
             elif ir == HLT:
-                pass
+                running = False
             else:
-                pass
+                print("Something went wrong!")
+                sys.exit(1)
