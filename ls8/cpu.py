@@ -76,5 +76,21 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-
-        pass
+        running = True
+        while running:
+            # It needs to read the memory address that's stored in register `PC
+            ir = self.ram_read(self.pc)
+            # Sometimes the byte value is a register number,other times it's a constant value
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+            # perform the actions needed for the instruction per the LS-8 spec
+            if ir == LDI:
+                pass
+            elif ir == PRN:
+                pass
+            elif ir == MUL:
+                pass
+            elif ir == HLT:
+                pass
+            else:
+                pass
