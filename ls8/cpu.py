@@ -100,3 +100,8 @@ class CPU:
             else:
                 print("Something went wrong!")
                 sys.exit(1)
+
+
+cpu = CPU()
+cpu.load()
+cpu.run()
