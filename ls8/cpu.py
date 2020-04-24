@@ -85,23 +85,24 @@ class CPU:
             # Which is the current index in memory
             ir = self.ram_read(self.pc)
             # Sometimes the byte value is a register number,other times it's a constant value
+            # Reg/Arg is one index over the pc
             operand_a = self.ram_read(self.pc + 1)
+            # Value is one index over the pc
             operand_b = self.ram_read(self.pc + 2)
             # perform the actions needed for the instruction per the LS-8 spec
             if ir == LDI:
                 # sets a specified register to a specified value.
                 self.reg[operand_a] = operand_b
-                self.pc += 3
+                self.pc += 3  # Add 3 to skip the operand_a & operand_b
             elif ir == PRN:
-                print(self.reg[operand_a])
-                self.pc += 2
+                print(self.reg[operand_a])  # Print value in given rgister
+                self.pc += 2  # Add 2 to move to HLT
             elif ir == HLT:
                 running = False
             else:
-                print("Something went wrong!")
-                sys.exit(1)
+                print("Unknown instruction!")
+                running = False
 
-
-cpu = CPU()
-cpu.load()
-cpu.run()
+# cpu = CPU()
+# cpu.load()
+# cpu.run()
