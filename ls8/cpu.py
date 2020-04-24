@@ -29,11 +29,36 @@ class CPU:
 
     def load(self):
         """Load a program into memory."""
+        # Read the entry in the comand line to get the file name we pass in
+        #sys.argv[0] == "ls8.py"
+        #sys.argv[1] == "examples/mult.ls8"
+        program_filename = sys.argv[1]
+        # print(f"File: {program_filename}")
+        # Un-hardcode the machine code
+        try:
+            with open(program_filename) as f:
+                address = 0
+                for line in f:
+                    # split comments
+                    comments = line.strip().split("#")
+                    # take only the first element in the line
+                    string = comments[0].strip()
+                    # Skip empty lines
+                    if string == "":
+                        continue
+                    # Convert binary string to integer
+                    int_val = int(string, 2)
+                    self.ram[address] = int_val
+                    address += 1
+                    # close file
+                f.close()
 
-        address = 0
+        except FileNotFoundError:
+            print("No File name found in the command line.")
+            sys.exit(2)
 
         # For now, we've just hardcoded a program:
-
+        """
         program = [
             # From print8.ls8
             0b10000010,  # LDI R0,8
@@ -43,10 +68,12 @@ class CPU:
             0b00000000,
             0b00000001,  # HLT
         ]
+     
 
-        for instruction in program:
+        for instruction in self.ram:
             self.ram[address] = instruction
             address += 1
+        """
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -100,9 +127,10 @@ class CPU:
             elif ir == HLT:
                 running = False
             else:
-                print("Unknown instruction!")
+                print("Unknown instruction, Fatal Error.")
                 running = False
 
-# cpu = CPU()
-# cpu.load()
+
+cpu = CPU()
+cpu.load()
 # cpu.run()
