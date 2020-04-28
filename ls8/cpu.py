@@ -7,6 +7,7 @@ LDI = 0b10000010
 # PRN: a pseudo-instruction that prints the numeric value stored in a register.
 PRN = 0b01000111
 HLT = 0b00000001  # HLT: halt the CPU and exit the emulator.
+MUL = 0b10100010
 
 
 class CPU:
@@ -81,7 +82,7 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         # elif op == "SUB": etc
-        elif op == "MUL":
+        elif op == MUL:
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
@@ -128,11 +129,14 @@ class CPU:
                 self.pc += 2  # Add 2 to move to HLT
             elif ir == HLT:
                 running = False
+            elif ir == MUL:
+                self.alu(ir, operand_a, operand_b)
+                self.pc += 3
             else:
                 print("Unknown instruction, Fatal Error.")
                 running = False
 
 
-cpu = CPU()
-cpu.load()
+# cpu = CPU()
+# cpu.load()
 # cpu.run()
