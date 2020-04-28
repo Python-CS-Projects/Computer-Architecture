@@ -129,7 +129,9 @@ class CPU:
                 self.pc += 2  # Add 2 to move to HLT
             elif ir == HLT:
                 running = False
+            # Check the LS-8 spec for what the `MUL` instruction does.
             elif ir == MUL:
+                # called the `alu()`
                 self.alu(ir, operand_a, operand_b)
                 self.pc += 3
             else:
