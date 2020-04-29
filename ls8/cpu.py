@@ -8,6 +8,8 @@ LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001  # HLT: halt the CPU and exit the emulator.
 MUL = 0b10100010
+SP = 7  # Stack Pointer
+# PUSH = 0xF4  # address `F4` if the stack is empty.
 
 
 class CPU:
@@ -19,8 +21,9 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0  # Program Counter, which is the address/index of the current instruction
         self.running = True
-
+        self.reg[SP] = 0xF4
     # Accepts the address to read and return the value stored there.
+
     def ram_read(self, address):
         return self.ram[address]
 
@@ -134,6 +137,17 @@ class CPU:
                 # called the `alu()`
                 self.alu(ir, operand_a, operand_b)
                 self.pc += 3
+            elif ir == PUSH:
+                # Decrement the stack pointer
+                self.reg[SP] -= 1  # Address of top of stack
+                # Copy value from register into memeory RAM
+                value = self.reg[operand_a]
+                # Get the address
+                adress = self.reg[SP]
+                #store in memeory
+                self.ram[adress] = value
+                # increase pointer "SP"
+                self.pc += 2
             else:
                 print("Unknown instruction, Fatal Error.")
                 running = False
