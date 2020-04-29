@@ -149,7 +149,12 @@ class CPU:
                 # increase pointer "SP"
                 self.pc += 2
             elif ir == POP:
-                pass
+                # Get the value from the address pointed to by `SP`
+                value = self.ram[self.reg[SP]]
+                # Copy the value from the address pointed to by `SP` to the given register.
+                self.reg[operand_a] = value
+                # Increment `SP`
+                self.reg[SP] += 1
             else:
                 print("Unknown instruction, Fatal Error.")
                 running = False
