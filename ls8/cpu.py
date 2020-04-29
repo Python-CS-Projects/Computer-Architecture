@@ -9,7 +9,8 @@ PRN = 0b01000111
 HLT = 0b00000001  # HLT: halt the CPU and exit the emulator.
 MUL = 0b10100010
 SP = 7  # Stack Pointer
-# PUSH = 0xF4  # address `F4` if the stack is empty.
+PUSH = 0b01000101  # address `F4` if the stack is empty.
+POP = 0b01000110
 
 
 class CPU:
@@ -21,7 +22,6 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0  # Program Counter, which is the address/index of the current instruction
         self.running = True
-        self.reg[SP] = 0xF4
     # Accepts the address to read and return the value stored there.
 
     def ram_read(self, address):
@@ -148,6 +148,8 @@ class CPU:
                 self.ram[adress] = value
                 # increase pointer "SP"
                 self.pc += 2
+            elif ir == POP:
+                pass
             else:
                 print("Unknown instruction, Fatal Error.")
                 running = False
