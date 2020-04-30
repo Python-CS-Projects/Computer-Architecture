@@ -3,14 +3,18 @@
 import sys
 
 # LDI: load "immediate", store a value in a register, or "set this register to this value".
-LDI = 0b10000010
+LDI = 0b10000010  # Decimal = 130
 # PRN: a pseudo-instruction that prints the numeric value stored in a register.
-PRN = 0b01000111
-HLT = 0b00000001  # HLT: halt the CPU and exit the emulator.
-MUL = 0b10100010
+PRN = 0b01000111  # Decimal = 71
+HLT = 0b00000001  # # Decimal = 1, HLT: halt the CPU and exit the emulator.
+MUL = 0b10100010  # Decimal = 162
+ADD = 0b10100000
 SP = 7  # Stack Pointer
-PUSH = 0b01000101  # address `F4` if the stack is empty.
-POP = 0b01000110
+PUSH = 0b01000101  # Decimal = 69, address `F4` if the stack is empty.
+POP = 0b01000110  # Decimal = 170
+# Calls a subroutine (function) at the address stored in the register.
+CALL = 0b01010000  # Decimal = 80
+RET = 0b00010001  # Decimal = 17, Return from subroutine.
 
 
 class CPU:
@@ -61,28 +65,10 @@ class CPU:
             print("No File name found in the command line.")
             sys.exit(2)
 
-        # For now, we've just hardcoded a program:
-        """
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
-     
-
-        for instruction in self.ram:
-            self.ram[address] = instruction
-            address += 1
-        """
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
-        if op == "ADD":
+        if op == ADD:
             self.reg[reg_a] += self.reg[reg_b]
         # elif op == "SUB": etc
         elif op == MUL:
@@ -130,11 +116,12 @@ class CPU:
             elif ir == PRN:
                 print(self.reg[operand_a])  # Print value in given rgister
                 self.pc += 2  # Add 2 to move to HLT
-            elif ir == HLT:
-                running = False
             # Check the LS-8 spec for what the `MUL` instruction does.
             elif ir == MUL:
                 # called the `alu()`
+                self.alu(ir, operand_a, operand_b)
+                self.pc += 3
+            elif ir == ADD:
                 self.alu(ir, operand_a, operand_b)
                 self.pc += 3
             elif ir == PUSH:
@@ -145,7 +132,8 @@ class CPU:
                 # Get the address
                 adress = self.reg[SP]
                 #store in memeory
-                self.ram[adress] = value
+                #self.ram[adress] = value
+                self.ram_write(adress, value)
                 # increase pointer "SP"
                 self.pc += 2
             elif ir == POP:
@@ -156,8 +144,22 @@ class CPU:
                 # Increment `SP`
                 self.reg[SP] += 1
                 self.pc += 2
+            elif ir == CALL:
+                # The address of the instruction directly after `CALL` is pushed onto the stack
+                self.reg[SP] -= 1
+                adress = self.reg[SP]
+                value = self.pc + 2
+                self.ram_write(adress, value)
+                # The PC is set to the address stored in the given register
+                self.pc = self.reg[operand_a]
+            elif ir == RET:
+                # Pop the value from the top of the stack and store it in the `PC`.
+                self.pc = self.ram_read(self.reg[SP])
+                self.reg[SP] += 1
+            elif ir == HLT:
+                running = False
             else:
-                print("Unknown instruction, Fatal Error.")
+                print(f"Unknown instruction of: {ir}")
                 running = False
 
 
